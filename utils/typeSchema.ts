@@ -1,12 +1,12 @@
 import { count } from 'console';
-import { em } from 'framer-motion/client';
+import { address, em } from 'framer-motion/client';
 import {z} from 'zod';
 import { de, fa, pl } from 'zod/v4/locales';
 
 export const StudentSchema = z.object({
     id: z.string(),
     firstName: z.string(),
-    middleName: z.string().optional(),
+    middleName: z.string(),
     lastName: z.string(),
     gender: z.enum(['MALE', 'FEMALE']),
     department: z.string(),
@@ -85,50 +85,59 @@ export const SecondarySchoolInfo = z.object({
 export type SecondarySchoolInfoType = z.infer<typeof SecondarySchoolInfo>;
 
 
-
-export const School_Leaving_Exams = z.object({
+export const emergencyContact = z.object({
     id: z.string(),
     student_id: z.string(),
-    subject: z.string(),
-    registration_no: z.string().optional(),
-    year_ec: z.date(),
-     grade_mark: z.number().min(0).max(100),
-})
+    full_name: z.string(),
+    phone_home: z.string().optional(),
+    phone_mobile: z.string(),
+    phone_office: z.string().optional(),
+    address_kebele: z.string().optional(),
+    address_woreda: z.string().optional(),
+    address_zone: z.string().optional(),
+    address_region: z.string().optional(),
+    address_town: z.string().optional(),
+});
+export type EmergencyContactType = z.infer<typeof emergencyContact>;
 
 
-export type SchoolLeavingExamsType = z.infer<typeof School_Leaving_Exams>;
+export const TranscriptSchema = z.object({
+  transcript_id: z.number().int().positive().optional(),
+  student_id: z.string().uuid(),
+  grade_9_file_path: z.string().min(1, "Grade 9 file path is required"),
+  grade_10_file_path: z.string().min(1, "Grade 10 file path is required"),
+  grade_11_file_path: z.string().min(1, "Grade 11 file path is required"),
+  grade_12_file_path: z.string().min(1, "Grade 12 file path is required"),
+  exam_file_path: z.string().min(1, "Exam file path is required"),
+  english_grade: z.number().int().min(0).max(100),
+  maths_grade: z.number().int().min(0).max(100),
+  created_at: z.date().default(() => new Date())
+});
+
+export const PastSecondarySchoolSchema = z.object({
+  past_secondary_id: z.number().int().positive().optional(),
+  student_id: z.string().uuid(),
+  file_paths: z.string().min(1, "At least one file path is required"),
+  created_at: z.date().default(() => new Date())
+});
+
+export type Transcript = z.infer<typeof TranscriptSchema>;
+export type PastSecondarySchool = z.infer<typeof PastSecondarySchoolSchema>;
 
 
-
-export const past_secondary_school = z.object({
-    id: z.string(),
-    student_id: z.string(),
-    institution_name: z.string(),
-    country: z.string(),
-    field_of_study: z.string().optional(),
-    qualification: z.string().optional(),
-    year_from: z.date(),
-    year_to: z.date(),
-    cumulative_gpa: z.number().min(0).max(4.0).optional(),
-    credits_accumulated: z.number().min(0).optional(),
-    completed: z.enum(['YES', 'NO']),
-})
-
-export type PastSecondarySchoolType = z.infer<typeof past_secondary_school>;
 
 
 
 export const EmploymentHistory = z.object({
-    id: z.string(),
-    student_id: z.string(),
-    is_current: z.boolean(),
-    type_of_job: z.string().optional(),
-    employer: z.string().optional(),
-    mailing_address: z.string().optional(),
-    telephone:z.string().optional(),
-    sevice_years_from: z.date().optional(),
-    service_years_to: z.date().optional(),
+    employment_id: z.number().int().positive().optional(), // Primary Key, Auto Increment (handled by DB)
+    student_id: z.string().min(1), // VARCHAR(20), Not Null, Foreign Key
+    is_current: z.enum(['Yes', 'No']), // ENUM('Yes', 'No'), Not Null
+    type_of_job: z.string().max(50).optional(), // VARCHAR(50)
+    employer: z.string().max(100).optional(), // VARCHAR(100)
+    mailing_address: z.string().max(255).optional(), // VARCHAR(255)
+    telephone: z.string().max(20).optional(), // VARCHAR(20)
+    service_years_from: z.number().int().min(1900).max(2100).optional(), // YEAR
+    service_years_to: z.number().int().min(1900).max(2100).optional(), // YEAR
+    created_at: z.date().default(() => new Date()), // TIMESTAMP, Not Null
 });
 export type EmploymentHistoryType = z.infer<typeof EmploymentHistory>;
-
-

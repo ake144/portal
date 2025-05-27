@@ -1,27 +1,54 @@
-// components/students/forms/PersonalInfoForm.tsx
 'use client';
+
 import { useStudentFormStore } from '@/store/studentFormStore';
 import { StudentFullInfo } from '@/utils/typeSchema';
 import { useEffect, useState } from 'react';
 import { z } from 'zod';
 import { FullInfo } from '@/utils/typeSchema';
 
+// Initialize with empty strings to prevent undefined values
+const initialPersonalInfo: StudentFullInfo = {
+  student_id: '',
+  student_temp_id: '',
+  firstName: '',
+  fatherName: '',
+  grandFather_Name: '',
+  sex: 'M',
+  nationality: '',
+  phone_Number: '',
+  email: '',
+  place_of_birth_town: '',
+  place_of_birth_zone: '',
+  place_of_birth_region: '',
+  date_of_birth: '',
+  address_kebele: '',
+  address_woreda: '',
+  address_zone: '',
+  address_region: '',
+  address_town: '',
+  phone_home: '',
+  phone_mobile: '',
+  phone_office: '',
+  department_id: '',
+  program_id: '',
+  admission_type_id: '',
+  registration_date: '',
+  MaritalStatus: 'SINGLE'
+};
+
 export default function PersonalInfoForm({ nextStep }: { nextStep: () => void }) {
   const { personalInfo, setPersonalInfo } = useStudentFormStore();
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  // Auto-fill from DB (mock example)
   useEffect(() => {
     async function fetchStudentData() {
       const mockData: Partial<StudentFullInfo> = {
         student_id: `STD-${Math.floor(1000 + Math.random() * 9000)}`,
         department_id: 'animal_health',
         registration_date: new Date().toISOString().split('T')[0],
-        sex: 'M',
-        MaritalStatus: 'SINGLE',
-        nationality: 'Ethiopian'
       };
-      setPersonalInfo({ ...personalInfo, ...mockData });
+      // Merge with initial values to ensure all fields are defined
+      setPersonalInfo({ ...initialPersonalInfo, ...mockData });
     }
     fetchStudentData();
   }, []);
@@ -48,6 +75,9 @@ export default function PersonalInfoForm({ nextStep }: { nextStep: () => void })
     if (errors[name]) setErrors(prev => ({ ...prev, [name]: '' }));
   };
 
+  // Helper function to safely get field values
+  const getValue = (field: keyof StudentFullInfo) => personalInfo[field] || '';
+
   return (
     <form onSubmit={handleSubmit} className="w-full max-w-4xl mx-auto p-6 space-y-8">
       {/* Student ID and Registration Date */}
@@ -57,7 +87,7 @@ export default function PersonalInfoForm({ nextStep }: { nextStep: () => void })
           <input
             type="text"
             name="student_id"
-            value={personalInfo.student_id}
+            value={getValue('student_id')}
             readOnly
             className="w-full p-2.5 border rounded-md bg-gray-100"
           />
@@ -67,7 +97,7 @@ export default function PersonalInfoForm({ nextStep }: { nextStep: () => void })
           <input
             type="date"
             name="registration_date"
-            value={personalInfo.registration_date}
+            value={getValue('registration_date')}
             readOnly
             className="w-full p-2.5 border rounded-md bg-gray-100"
           />
@@ -78,11 +108,12 @@ export default function PersonalInfoForm({ nextStep }: { nextStep: () => void })
       <div className="bg-gray-50 p-6 rounded-lg space-y-6">
         <h3 className="text-xl font-semibold text-gray-800">Personal Information</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* All input fields updated with getValue() */}
           <div className="space-y-2">
             <label className="block text-sm font-medium text-gray-700">First Name *</label>
             <input
               name="firstName"
-              value={personalInfo.firstName}
+              value={getValue('firstName')}
               onChange={handleChange}
               className="w-full p-2.5 border rounded-md focus:ring-2 focus:ring-blue-500"
             />
@@ -93,7 +124,7 @@ export default function PersonalInfoForm({ nextStep }: { nextStep: () => void })
             <label className="block text-sm font-medium text-gray-700">Father's Name</label>
             <input
               name="fatherName"
-              value={personalInfo.fatherName}
+              value={getValue('fatherName')}
               onChange={handleChange}
               className="w-full p-2.5 border rounded-md focus:ring-2 focus:ring-blue-500"
             />
@@ -103,7 +134,7 @@ export default function PersonalInfoForm({ nextStep }: { nextStep: () => void })
             <label className="block text-sm font-medium text-gray-700">Grandfather's Name *</label>
             <input
               name="grandFather_Name"
-              value={personalInfo.grandFather_Name}
+              value={getValue('grandFather_Name')}
               onChange={handleChange}
               className="w-full p-2.5 border rounded-md focus:ring-2 focus:ring-blue-500"
             />
@@ -116,7 +147,7 @@ export default function PersonalInfoForm({ nextStep }: { nextStep: () => void })
             <label className="block text-sm font-medium text-gray-700">Sex *</label>
             <select
               name="sex"
-              value={personalInfo.sex}
+              value={getValue('sex')}
               onChange={handleChange}
               className="w-full p-2.5 border rounded-md focus:ring-2 focus:ring-blue-500"
             >
@@ -129,7 +160,7 @@ export default function PersonalInfoForm({ nextStep }: { nextStep: () => void })
             <label className="block text-sm font-medium text-gray-700">Nationality *</label>
             <input
               name="nationality"
-              value={personalInfo.nationality}
+              value={getValue('nationality')}
               onChange={handleChange}
               className="w-full p-2.5 border rounded-md focus:ring-2 focus:ring-blue-500"
             />
@@ -140,7 +171,7 @@ export default function PersonalInfoForm({ nextStep }: { nextStep: () => void })
             <input
               type="date"
               name="date_of_birth"
-              value={personalInfo.date_of_birth}
+              value={getValue('date_of_birth')}
               onChange={handleChange}
               className="w-full p-2.5 border rounded-md focus:ring-2 focus:ring-blue-500"
             />
@@ -156,7 +187,7 @@ export default function PersonalInfoForm({ nextStep }: { nextStep: () => void })
             <label className="block text-sm font-medium text-gray-700">Town</label>
             <input
               name="place_of_birth_town"
-              value={personalInfo.place_of_birth_town}
+              value={getValue('place_of_birth_town')}
               onChange={handleChange}
               className="w-full p-2.5 border rounded-md focus:ring-2 focus:ring-blue-500"
             />
@@ -165,7 +196,7 @@ export default function PersonalInfoForm({ nextStep }: { nextStep: () => void })
             <label className="block text-sm font-medium text-gray-700">Zone</label>
             <input
               name="place_of_birth_zone"
-              value={personalInfo.place_of_birth_zone}
+              value={getValue('place_of_birth_zone')}
               onChange={handleChange}
               className="w-full p-2.5 border rounded-md focus:ring-2 focus:ring-blue-500"
             />
@@ -174,7 +205,7 @@ export default function PersonalInfoForm({ nextStep }: { nextStep: () => void })
             <label className="block text-sm font-medium text-gray-700">Region</label>
             <input
               name="place_of_birth_region"
-              value={personalInfo.place_of_birth_region}
+              value={getValue('place_of_birth_region')}
               onChange={handleChange}
               className="w-full p-2.5 border rounded-md focus:ring-2 focus:ring-blue-500"
             />
@@ -190,7 +221,7 @@ export default function PersonalInfoForm({ nextStep }: { nextStep: () => void })
             <label className="block text-sm font-medium text-gray-700">Kebele</label>
             <input
               name="address_kebele"
-              value={personalInfo.address_kebele}
+              value={getValue("address_kebele")}
               onChange={handleChange}
               className="w-full p-2.5 border rounded-md focus:ring-2 focus:ring-blue-500"
             />
@@ -199,7 +230,7 @@ export default function PersonalInfoForm({ nextStep }: { nextStep: () => void })
             <label className="block text-sm font-medium text-gray-700">Woreda</label>
             <input
               name="address_woreda"
-              value={personalInfo.address_woreda}
+              value={getValue("address_woreda")}
               onChange={handleChange}
               className="w-full p-2.5 border rounded-md focus:ring-2 focus:ring-blue-500"
             />
@@ -208,7 +239,7 @@ export default function PersonalInfoForm({ nextStep }: { nextStep: () => void })
             <label className="block text-sm font-medium text-gray-700">Zone</label>
             <input
               name="address_zone"
-              value={personalInfo.address_zone}
+              value={getValue("address_zone")}
               onChange={handleChange}
               className="w-full p-2.5 border rounded-md focus:ring-2 focus:ring-blue-500"
             />
@@ -217,7 +248,7 @@ export default function PersonalInfoForm({ nextStep }: { nextStep: () => void })
             <label className="block text-sm font-medium text-gray-700">Region</label>
             <input
               name="address_region"
-              value={personalInfo.address_region}
+              value={getValue("address_region")}
               onChange={handleChange}
               className="w-full p-2.5 border rounded-md focus:ring-2 focus:ring-blue-500"
             />
@@ -226,7 +257,7 @@ export default function PersonalInfoForm({ nextStep }: { nextStep: () => void })
             <label className="block text-sm font-medium text-gray-700">Town</label>
             <input
               name="address_town"
-              value={personalInfo.address_town}
+              value={getValue("address_town")}
               onChange={handleChange}
               className="w-full p-2.5 border rounded-md focus:ring-2 focus:ring-blue-500"
             />
@@ -243,7 +274,7 @@ export default function PersonalInfoForm({ nextStep }: { nextStep: () => void })
             <input
               type="tel"
               name="phone_mobile"
-              value={personalInfo.phone_mobile}
+              value={getValue('phone_mobile')}
               onChange={handleChange}
               className="w-full p-2.5 border rounded-md focus:ring-2 focus:ring-blue-500"
             />
@@ -254,7 +285,7 @@ export default function PersonalInfoForm({ nextStep }: { nextStep: () => void })
             <input
               type="tel"
               name="phone_home"
-              value={personalInfo.phone_home}
+              value={getValue('phone_home')}
               onChange={handleChange}
               className="w-full p-2.5 border rounded-md focus:ring-2 focus:ring-blue-500"
             />
@@ -264,7 +295,7 @@ export default function PersonalInfoForm({ nextStep }: { nextStep: () => void })
             <input
               type="email"
               name="email"
-              value={personalInfo.email}
+              value={getValue('email')}
               onChange={handleChange}
               className="w-full p-2.5 border rounded-md focus:ring-2 focus:ring-blue-500"
             />
@@ -280,7 +311,7 @@ export default function PersonalInfoForm({ nextStep }: { nextStep: () => void })
             <label className="block text-sm font-medium text-gray-700">Department *</label>
             <select
               name="department_id"
-              value={personalInfo.department_id}
+              value={getValue('department_id')}
               onChange={handleChange}
               className="w-full p-2.5 border rounded-md focus:ring-2 focus:ring-blue-500"
             >
@@ -296,7 +327,7 @@ export default function PersonalInfoForm({ nextStep }: { nextStep: () => void })
             <label className="block text-sm font-medium text-gray-700">Program ID *</label>
             <input
               name="program_id"
-              value={personalInfo.program_id}
+              value={getValue('program_id')}
               onChange={handleChange}
               className="w-full p-2.5 border rounded-md focus:ring-2 focus:ring-blue-500"
             />
@@ -305,7 +336,7 @@ export default function PersonalInfoForm({ nextStep }: { nextStep: () => void })
             <label className="block text-sm font-medium text-gray-700">Admission Type *</label>
             <input
               name="admission_type_id"
-              value={personalInfo.admission_type_id}
+              value={getValue('admission_type_id')}
               onChange={handleChange}
               className="w-full p-2.5 border rounded-md focus:ring-2 focus:ring-blue-500"
             />
@@ -319,7 +350,7 @@ export default function PersonalInfoForm({ nextStep }: { nextStep: () => void })
           <label className="block text-sm font-medium text-gray-700">Marital Status *</label>
           <select
             name="MaritalStatus"
-            value={personalInfo.MaritalStatus}
+            value={getValue('MaritalStatus')}
             onChange={handleChange}
             className="w-full p-2.5 border rounded-md focus:ring-2 focus:ring-blue-500"
           >

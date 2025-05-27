@@ -50,7 +50,7 @@ export function StudentForm() {
     { value: 'natural_resources', label: 'Natural Resources Conservation and Development' },
   ];
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setInputValue(value);
     setFormData(prev => ({ ...prev, department: value }));
@@ -81,11 +81,24 @@ export function StudentForm() {
       lastName: '',
       gender: 'MALE',
     }));
-    const selectedDepartment = DepartmentList.find(
-      dept => dept.value === validatedData.department
+     
+     const res =  await fetch('http://192.168.1.11:3000/api/tempStudents',{
+        method: 'POST',
+
+        body: JSON.stringify(formData),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+     }) 
+     if(res){
+        const selectedDepartment = DepartmentList.find(
+       dept => dept.value === validatedData.department
     );
       setInputValue(selectedDepartment?.label || '');
       setErrors({});
+         
+     }
+  
     } catch (error) {
       if (error instanceof z.ZodError) {
         const newErrors: Record<string, string> = {};

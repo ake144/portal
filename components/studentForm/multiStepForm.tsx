@@ -2,9 +2,12 @@
 'use client';
 import { useState } from 'react';
 
-import { StudentFullInfo, ParentInfoType, SecondarySchoolInfoType, SchoolLeavingExamsType, PastSecondarySchoolType, EmploymentHistoryType } from '../schemas/studentSchemas';
 import { useStudentFormStore } from '@/store/studentFormStore';
 import PersonalInfoForm from './personalInfoForm';
+import FamilyInfoForm from './familyInfo';
+import ContactInfoForm from './contactInfoForm';
+import AcademicBackgroundForm from './academicBackground';
+import EmploymentHistoryForm from './employmentHistory';
 
 export default function MultiStepForm() {
   const [step, setStep] = useState(1);
@@ -29,16 +32,12 @@ export default function MultiStepForm() {
       
       {step === 1 && (
         <PersonalInfoForm 
-          data={formData.personal}
-          onUpdate={(data) => setFormData(prev => ({...prev, personal: data}))}
           nextStep={nextStep}
         />
       )}
       
       {step === 2 && (
         <ContactInfoForm 
-          data={formData.contact}
-          onUpdate={(data) => setFormData(prev => ({...prev, contact: data}))}
           nextStep={nextStep}
           prevStep={prevStep}
         />
@@ -46,8 +45,6 @@ export default function MultiStepForm() {
       
       {step === 3 && (
         <AcademicBackgroundForm 
-          data={formData.academic}
-          onUpdate={(data) => setFormData(prev => ({...prev, academic: data}))}
           nextStep={nextStep}
           prevStep={prevStep}
         />
@@ -55,8 +52,6 @@ export default function MultiStepForm() {
       
       {step === 4 && (
         <FamilyInfoForm 
-          data={formData.family}
-          onUpdate={(data) => setFormData(prev => ({...prev, family: data}))}
           nextStep={nextStep}
           prevStep={prevStep}
         />
@@ -64,12 +59,11 @@ export default function MultiStepForm() {
       
       {step === 5 && (
         <EmploymentHistoryForm 
-          data={formData.employment}
-          onUpdate={(data) => setFormData(prev => ({...prev, employment: data}))}
-          submit={handleSubmit}
+          nextStep={nextStep}
           prevStep={prevStep}
         />
       )}
+   
     </div>
   );
 }
