@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useStudentFormStore } from '@/store/studentFormStore';
@@ -5,8 +6,10 @@ import { StudentFullInfo } from '@/utils/typeSchema';
 import { useEffect, useState } from 'react';
 import { z } from 'zod';
 import { FullInfo } from '@/utils/typeSchema';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
-// Initialize with empty strings to prevent undefined values
 const initialPersonalInfo: StudentFullInfo = {
   student_id: '',
   student_temp_id: '',
@@ -47,22 +50,24 @@ export default function PersonalInfoForm({ nextStep }: { nextStep: () => void })
         department_id: 'animal_health',
         registration_date: new Date().toISOString().split('T')[0],
       };
-      // Merge with initial values to ensure all fields are defined
       setPersonalInfo({ ...initialPersonalInfo, ...mockData });
     }
     fetchStudentData();
-  }, []);
+  }, [setPersonalInfo]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     try {
       FullInfo.parse(personalInfo);
+      setErrors({});
       nextStep();
     } catch (error) {
       if (error instanceof z.ZodError) {
         const newErrors: Record<string, string> = {};
         error.errors.forEach(err => {
-          newErrors[err.path[0]] = err.message;
+          if (err.path.length > 0) {
+            newErrors[err.path[0] as string] = err.message;
+          }
         });
         setErrors(newErrors);
       }
@@ -72,304 +77,379 @@ export default function PersonalInfoForm({ nextStep }: { nextStep: () => void })
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setPersonalInfo({ ...personalInfo, [name]: value });
-    if (errors[name]) setErrors(prev => ({ ...prev, [name]: '' }));
+    if (errors[name]) {
+      setErrors(prev => ({ ...prev, [name]: '' }));
+    }
   };
 
-  // Helper function to safely get field values
   const getValue = (field: keyof StudentFullInfo) => personalInfo[field] || '';
 
+  const getInputClassName = (fieldName: string, hasError: boolean = false) => {
+    const baseClasses = "w-full transition-colors duration-200";
+    const errorClasses = hasError ? "border-red-500 focus:ring-red-500" : "border-gray-300 focus:ring-blue-500";
+    return `${baseClasses} ${errorClasses}`;
+  };
+
   return (
-    <form onSubmit={handleSubmit} className="w-full max-w-4xl mx-auto p-6 space-y-8">
-      {/* Student ID and Registration Date */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="space-y-2">
-          <label className="block text-sm font-medium text-gray-700">Student ID</label>
-          <input
-            type="text"
-            name="student_id"
-            value={getValue('student_id')}
-            readOnly
-            className="w-full p-2.5 border rounded-md bg-gray-100"
-          />
+    <div className="w-full max-w-6xl mx-auto">
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
+        <div className="mb-8">
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Personal Information</h2>
+          <p className="text-gray-600">Please fill in your personal details. Fields marked with <span className="text-red-500">*</span> are required.</p>
         </div>
-        <div className="space-y-2">
-          <label className="block text-sm font-medium text-gray-700">Registration Date</label>
-          <input
-            type="date"
-            name="registration_date"
-            value={getValue('registration_date')}
-            readOnly
-            className="w-full p-2.5 border rounded-md bg-gray-100"
-          />
-        </div>
-      </div>
 
-      {/* Personal Information Section */}
-      <div className="bg-gray-50 p-6 rounded-lg space-y-6">
-        <h3 className="text-xl font-semibold text-gray-800">Personal Information</h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {/* All input fields updated with getValue() */}
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700">First Name *</label>
-            <input
-              name="firstName"
-              value={getValue('firstName')}
-              onChange={handleChange}
-              className="w-full p-2.5 border rounded-md focus:ring-2 focus:ring-blue-500"
-            />
-            {errors.firstName && <p className="text-red-500 text-sm mt-1">{errors.firstName}</p>}
+        <form onSubmit={handleSubmit} className="space-y-8">
+          {/* Student ID and Registration Date */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <Label htmlFor="student_id">Student ID</Label>
+              <Input
+                id="student_id"
+                name="student_id"
+                value={getValue('student_id')}
+                readOnly
+                className="bg-gray-50"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="registration_date">Registration Date</Label>
+              <Input
+                id="registration_date"
+                type="date"
+                name="registration_date"
+                value={getValue('registration_date')}
+                readOnly
+                className="bg-gray-50"
+              />
+            </div>
           </div>
 
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700">Father's Name</label>
-            <input
-              name="fatherName"
-              value={getValue('fatherName')}
-              onChange={handleChange}
-              className="w-full p-2.5 border rounded-md focus:ring-2 focus:ring-blue-500"
-            />
+          {/* Personal Information Section */}
+          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-lg border border-blue-100">
+            <h3 className="text-lg font-semibold text-gray-800 mb-4">Basic Information</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="space-y-2">
+                <Label htmlFor="firstName">
+                  First Name <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  id="firstName"
+                  name="firstName"
+                  value={getValue('firstName')}
+                  onChange={handleChange}
+                  className={getInputClassName('firstName', !!errors.firstName)}
+                  placeholder="Enter first name"
+                />
+                {errors.firstName && <p className="text-red-500 text-sm mt-1">{errors.firstName}</p>}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="fatherName">Father's Name</Label>
+                <Input
+                  id="fatherName"
+                  name="fatherName"
+                  value={getValue('fatherName')}
+                  onChange={handleChange}
+                  placeholder="Enter father's name"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="grandFather_Name">
+                  Grandfather's Name <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  id="grandFather_Name"
+                  name="grandFather_Name"
+                  value={getValue('grandFather_Name')}
+                  onChange={handleChange}
+                  className={getInputClassName('grandFather_Name', !!errors.grandFather_Name)}
+                  placeholder="Enter grandfather's name"
+                />
+                {errors.grandFather_Name && (
+                  <p className="text-red-500 text-sm mt-1">{errors.grandFather_Name}</p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="sex">
+                  Sex <span className="text-red-500">*</span>
+                </Label>
+                <select
+                  id="sex"
+                  name="sex"
+                  value={getValue('sex')}
+                  onChange={handleChange}
+                  className={`${getInputClassName('sex')} h-10 px-3 py-2 border rounded-md focus:outline-none focus:ring-2`}
+                >
+                  <option value="M">Male</option>
+                  <option value="F">Female</option>
+                </select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="nationality">
+                  Nationality <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  id="nationality"
+                  name="nationality"
+                  value={getValue('nationality')}
+                  onChange={handleChange}
+                  className={getInputClassName('nationality', !!errors.nationality)}
+                  placeholder="Enter nationality"
+                />
+                {errors.nationality && <p className="text-red-500 text-sm mt-1">{errors.nationality}</p>}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="date_of_birth">
+                  Date of Birth <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  id="date_of_birth"
+                  type="date"
+                  name="date_of_birth"
+                  value={getValue('date_of_birth')}
+                  onChange={handleChange}
+                  className={getInputClassName('date_of_birth', !!errors.date_of_birth)}
+                />
+                {errors.date_of_birth && <p className="text-red-500 text-sm mt-1">{errors.date_of_birth}</p>}
+              </div>
+            </div>
           </div>
 
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700">Grandfather's Name *</label>
-            <input
-              name="grandFather_Name"
-              value={getValue('grandFather_Name')}
-              onChange={handleChange}
-              className="w-full p-2.5 border rounded-md focus:ring-2 focus:ring-blue-500"
-            />
-            {errors.grandFather_Name && (
-              <p className="text-red-500 text-sm mt-1">{errors.grandFather_Name}</p>
-            )}
+          {/* Place of Birth Section */}
+          <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-6 rounded-lg border border-green-100">
+            <h3 className="text-lg font-semibold text-gray-800 mb-4">Place of Birth</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="space-y-2">
+                <Label htmlFor="place_of_birth_town">Town</Label>
+                <Input
+                  id="place_of_birth_town"
+                  name="place_of_birth_town"
+                  value={getValue('place_of_birth_town')}
+                  onChange={handleChange}
+                  placeholder="Enter town"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="place_of_birth_zone">Zone</Label>
+                <Input
+                  id="place_of_birth_zone"
+                  name="place_of_birth_zone"
+                  value={getValue('place_of_birth_zone')}
+                  onChange={handleChange}
+                  placeholder="Enter zone"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="place_of_birth_region">Region</Label>
+                <Input
+                  id="place_of_birth_region"
+                  name="place_of_birth_region"
+                  value={getValue('place_of_birth_region')}
+                  onChange={handleChange}
+                  placeholder="Enter region"
+                />
+              </div>
+            </div>
           </div>
 
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700">Sex *</label>
-            <select
-              name="sex"
-              value={getValue('sex')}
-              onChange={handleChange}
-              className="w-full p-2.5 border rounded-md focus:ring-2 focus:ring-blue-500"
+          {/* Address Information Section */}
+          <div className="bg-gradient-to-r from-purple-50 to-pink-50 p-6 rounded-lg border border-purple-100">
+            <h3 className="text-lg font-semibold text-gray-800 mb-4">Current Address</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="space-y-2">
+                <Label htmlFor="address_kebele">Kebele</Label>
+                <Input
+                  id="address_kebele"
+                  name="address_kebele"
+                  value={getValue("address_kebele")}
+                  onChange={handleChange}
+                  placeholder="Enter kebele"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="address_woreda">Woreda</Label>
+                <Input
+                  id="address_woreda"
+                  name="address_woreda"
+                  value={getValue("address_woreda")}
+                  onChange={handleChange}
+                  placeholder="Enter woreda"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="address_zone">Zone</Label>
+                <Input
+                  id="address_zone"
+                  name="address_zone"
+                  value={getValue("address_zone")}
+                  onChange={handleChange}
+                  placeholder="Enter zone"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="address_region">Region</Label>
+                <Input
+                  id="address_region"
+                  name="address_region"
+                  value={getValue("address_region")}
+                  onChange={handleChange}
+                  placeholder="Enter region"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="address_town">Town</Label>
+                <Input
+                  id="address_town"
+                  name="address_town"
+                  value={getValue("address_town")}
+                  onChange={handleChange}
+                  placeholder="Enter town"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Contact Information Section */}
+          <div className="bg-gradient-to-r from-orange-50 to-red-50 p-6 rounded-lg border border-orange-100">
+            <h3 className="text-lg font-semibold text-gray-800 mb-4">Contact Information</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="space-y-2">
+                <Label htmlFor="phone_mobile">
+                  Mobile Phone <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  id="phone_mobile"
+                  type="tel"
+                  name="phone_mobile"
+                  value={getValue('phone_mobile')}
+                  onChange={handleChange}
+                  className={getInputClassName('phone_mobile', !!errors.phone_mobile)}
+                  placeholder="Enter mobile number"
+                />
+                {errors.phone_mobile && <p className="text-red-500 text-sm mt-1">{errors.phone_mobile}</p>}
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="phone_home">Home Phone</Label>
+                <Input
+                  id="phone_home"
+                  type="tel"
+                  name="phone_home"
+                  value={getValue('phone_home')}
+                  onChange={handleChange}
+                  placeholder="Enter home phone"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  name="email"
+                  value={getValue('email')}
+                  onChange={handleChange}
+                  className={getInputClassName('email', !!errors.email)}
+                  placeholder="Enter email address"
+                />
+                {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
+              </div>
+            </div>
+          </div>
+
+          {/* Academic Information Section */}
+          <div className="bg-gradient-to-r from-cyan-50 to-blue-50 p-6 rounded-lg border border-cyan-100">
+            <h3 className="text-lg font-semibold text-gray-800 mb-4">Academic Information</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="space-y-2">
+                <Label htmlFor="department_id">
+                  Department <span className="text-red-500">*</span>
+                </Label>
+                <select
+                  id="department_id"
+                  name="department_id"
+                  value={getValue('department_id')}
+                  onChange={handleChange}
+                  className={`${getInputClassName('department_id', !!errors.department_id)} h-10 px-3 py-2 border rounded-md focus:outline-none focus:ring-2`}
+                >
+                  <option value="">Select Department</option>
+                  <option value="animal_health">Animal Health</option>
+                  <option value="animal_production">Animal Production</option>
+                  <option value="crop_production">Crop Production</option>
+                  <option value="cooperative_accounting">Cooperative Accounting</option>
+                  <option value="crop_protection">Crop Protection</option>
+                  <option value="natural_resources">Natural Resources Conservation</option>
+                </select>
+                {errors.department_id && <p className="text-red-500 text-sm mt-1">{errors.department_id}</p>}
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="program_id">
+                  Program ID <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  id="program_id"
+                  name="program_id"
+                  value={getValue('program_id')}
+                  onChange={handleChange}
+                  className={getInputClassName('program_id', !!errors.program_id)}
+                  placeholder="Enter program ID"
+                />
+                {errors.program_id && <p className="text-red-500 text-sm mt-1">{errors.program_id}</p>}
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="admission_type_id">
+                  Admission Type <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  id="admission_type_id"
+                  name="admission_type_id"
+                  value={getValue('admission_type_id')}
+                  onChange={handleChange}
+                  className={getInputClassName('admission_type_id', !!errors.admission_type_id)}
+                  placeholder="Enter admission type"
+                />
+                {errors.admission_type_id && <p className="text-red-500 text-sm mt-1">{errors.admission_type_id}</p>}
+              </div>
+            </div>
+          </div>
+
+          {/* Marital Status Section */}
+          <div className="bg-gradient-to-r from-gray-50 to-slate-50 p-6 rounded-lg border border-gray-200">
+            <h3 className="text-lg font-semibold text-gray-800 mb-4">Personal Status</h3>
+            <div className="space-y-2 max-w-md">
+              <Label htmlFor="MaritalStatus">
+                Marital Status <span className="text-red-500">*</span>
+              </Label>
+              <select
+                id="MaritalStatus"
+                name="MaritalStatus"
+                value={getValue('MaritalStatus')}
+                onChange={handleChange}
+                className="w-full h-10 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="SINGLE">Single</option>
+                <option value="MARRIED">Married</option>
+                <option value="DIVORCED">Divorced</option>
+                <option value="WIDOWED">Widowed</option>
+              </select>
+            </div>
+          </div>
+
+          <div className="flex justify-between items-center pt-6 border-t border-gray-200">
+            <div className="text-sm text-gray-600">
+              Step 1 of 5: Personal Information
+            </div>
+            <Button
+              type="submit"
+              className="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors duration-200"
             >
-              <option value="M">Male</option>
-              <option value="F">Female</option>
-            </select>
+              Next Step →
+            </Button>
           </div>
-
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700">Nationality *</label>
-            <input
-              name="nationality"
-              value={getValue('nationality')}
-              onChange={handleChange}
-              className="w-full p-2.5 border rounded-md focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700">Date of Birth *</label>
-            <input
-              type="date"
-              name="date_of_birth"
-              value={getValue('date_of_birth')}
-              onChange={handleChange}
-              className="w-full p-2.5 border rounded-md focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-        </div>
+        </form>
       </div>
-
-      {/* Place of Birth Section */}
-      <div className="bg-gray-50 p-6 rounded-lg space-y-6">
-        <h3 className="text-xl font-semibold text-gray-800">Place of Birth</h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700">Town</label>
-            <input
-              name="place_of_birth_town"
-              value={getValue('place_of_birth_town')}
-              onChange={handleChange}
-              className="w-full p-2.5 border rounded-md focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700">Zone</label>
-            <input
-              name="place_of_birth_zone"
-              value={getValue('place_of_birth_zone')}
-              onChange={handleChange}
-              className="w-full p-2.5 border rounded-md focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700">Region</label>
-            <input
-              name="place_of_birth_region"
-              value={getValue('place_of_birth_region')}
-              onChange={handleChange}
-              className="w-full p-2.5 border rounded-md focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* Address Information Section */}
-      <div className="bg-gray-50 p-6 rounded-lg space-y-6">
-        <h3 className="text-xl font-semibold text-gray-800">Current Address</h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700">Kebele</label>
-            <input
-              name="address_kebele"
-              value={getValue("address_kebele")}
-              onChange={handleChange}
-              className="w-full p-2.5 border rounded-md focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700">Woreda</label>
-            <input
-              name="address_woreda"
-              value={getValue("address_woreda")}
-              onChange={handleChange}
-              className="w-full p-2.5 border rounded-md focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700">Zone</label>
-            <input
-              name="address_zone"
-              value={getValue("address_zone")}
-              onChange={handleChange}
-              className="w-full p-2.5 border rounded-md focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700">Region</label>
-            <input
-              name="address_region"
-              value={getValue("address_region")}
-              onChange={handleChange}
-              className="w-full p-2.5 border rounded-md focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700">Town</label>
-            <input
-              name="address_town"
-              value={getValue("address_town")}
-              onChange={handleChange}
-              className="w-full p-2.5 border rounded-md focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* Contact Information Section */}
-      <div className="bg-gray-50 p-6 rounded-lg space-y-6">
-        <h3 className="text-xl font-semibold text-gray-800">Contact Information</h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700">Mobile Phone *</label>
-            <input
-              type="tel"
-              name="phone_mobile"
-              value={getValue('phone_mobile')}
-              onChange={handleChange}
-              className="w-full p-2.5 border rounded-md focus:ring-2 focus:ring-blue-500"
-            />
-            {errors.phone_mobile && <p className="text-red-500 text-sm mt-1">{errors.phone_mobile}</p>}
-          </div>
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700">Home Phone</label>
-            <input
-              type="tel"
-              name="phone_home"
-              value={getValue('phone_home')}
-              onChange={handleChange}
-              className="w-full p-2.5 border rounded-md focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700">Email</label>
-            <input
-              type="email"
-              name="email"
-              value={getValue('email')}
-              onChange={handleChange}
-              className="w-full p-2.5 border rounded-md focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* Academic Information Section */}
-      <div className="bg-gray-50 p-6 rounded-lg space-y-6">
-        <h3 className="text-xl font-semibold text-gray-800">Academic Information</h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700">Department *</label>
-            <select
-              name="department_id"
-              value={getValue('department_id')}
-              onChange={handleChange}
-              className="w-full p-2.5 border rounded-md focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="animal_health">Animal Health</option>
-              <option value="animal_production">Animal Production</option>
-              <option value="crop_production">Crop Production</option>
-              <option value="cooperative_accounting">Cooperative Accounting</option>
-              <option value="crop_protection">Crop Protection</option>
-              <option value="natural_resources">Natural Resources Conservation</option>
-            </select>
-          </div>
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700">Program ID *</label>
-            <input
-              name="program_id"
-              value={getValue('program_id')}
-              onChange={handleChange}
-              className="w-full p-2.5 border rounded-md focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700">Admission Type *</label>
-            <input
-              name="admission_type_id"
-              value={getValue('admission_type_id')}
-              onChange={handleChange}
-              className="w-full p-2.5 border rounded-md focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* Marital Status Section */}
-      <div className="bg-gray-50 p-6 rounded-lg space-y-6">
-        <div className="space-y-2">
-          <label className="block text-sm font-medium text-gray-700">Marital Status *</label>
-          <select
-            name="MaritalStatus"
-            value={getValue('MaritalStatus')}
-            onChange={handleChange}
-            className="w-full p-2.5 border rounded-md focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="SINGLE">Single</option>
-            <option value="MARRIED">Married</option>
-            <option value="DIVORCED">Divorced</option>
-            <option value="WIDOWED">Widowed</option>
-          </select>
-        </div>
-      </div>
-
-      <div className="flex justify-end">
-        <button
-          type="submit"
-          className="px-6 py-2.5 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
-        >
-          Next Step →
-        </button>
-      </div>
-    </form>
+    </div>
   );
 }

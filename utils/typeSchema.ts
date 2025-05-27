@@ -16,40 +16,34 @@ export const StudentSchema = z.object({
 export type Student = z.infer<typeof StudentSchema>;
 
 
-export const FullInfo= z.object({
-    student_id: z.string(),
-    student_temp_id: z.string(),
-    firstName: z.string(),
-    fatherName: z.string().optional(),
-    grandFather_Name: z.string(),
-    sex: z.enum(['M', 'F']),
-    nationality: z.string(),
-    phone_Number: z.string().optional(),
-    email: z.string().email().optional(),
-
-    place_of_birth_town: z.string().optional(),
-    place_of_birth_zone: z.string().optional(),
-    place_of_birth_region: z.string().optional(),
-   
-    date_of_birth: z.string(),
-    address_kebele: z.string().optional(),
-    address_woreda: z.string().optional(),
-    address_zone: z.string().optional(),
-    address_region: z.string().optional(),
-    address_town: z.string().optional(),
-
-
-    phone_home: z.string().optional(),
-    phone_mobile: z.string(),
-    phone_office: z.string().optional(),
-
-    department_id: z.string(),
-    program_id: z.string(),
-    admission_type_id: z.string(),
-
-    registration_date: z.string(),
-    MaritalStatus: z.enum(['SINGLE', 'MARRIED', 'DIVORCED', 'WIDOWED']),
-   })
+export const FullInfo = z.object({
+  student_id: z.string().min(1, "Student ID is required"),
+  student_temp_id: z.string(),
+  firstName: z.string().min(1, "First name is required"),
+  fatherName: z.string().min(1, "Father's name is required"),
+  grandFather_Name: z.string().min(1, "Grandfather's name is required"),
+  sex: z.enum(['M', 'F']),
+  nationality: z.string().min(1, "Nationality is required"),
+  phone_Number: z.string().optional(),
+  email: z.string().email("Invalid email format").optional().or(z.literal('')),
+  place_of_birth_town: z.string().optional(),
+  place_of_birth_zone: z.string().optional(),
+  place_of_birth_region: z.string().optional(),
+  date_of_birth: z.string().min(1, "Date of birth is required"),
+  address_kebele: z.string().optional(),
+  address_woreda: z.string().optional(),
+  address_zone: z.string().optional(),
+  address_region: z.string().optional(),
+  address_town: z.string().optional(),
+  phone_home: z.string().optional(),
+  phone_mobile: z.string().min(1, "Mobile phone is required"),
+  phone_office: z.string().optional(),
+  department_id: z.string().min(1, "Department is required"),
+  program_id: z.string().min(1, "Program ID is required"),
+  admission_type_id: z.string().min(1, "Admission type is required"),
+  registration_date: z.string().min(1, "Registration date is required"),
+  MaritalStatus: z.enum(['SINGLE', 'MARRIED', 'DIVORCED', 'WIDOWED'])
+});
 
 export type StudentFullInfo = z.infer<typeof FullInfo>;
 
@@ -103,7 +97,7 @@ export type EmergencyContactType = z.infer<typeof emergencyContact>;
 
 export const TranscriptSchema = z.object({
   transcript_id: z.number().int().positive().optional(),
-  student_id: z.string().uuid(),
+  student_id: z.string(),
   grade_9_file_path: z.string().min(1, "Grade 9 file path is required"),
   grade_10_file_path: z.string().min(1, "Grade 10 file path is required"),
   grade_11_file_path: z.string().min(1, "Grade 11 file path is required"),
@@ -116,10 +110,11 @@ export const TranscriptSchema = z.object({
 
 export const PastSecondarySchoolSchema = z.object({
   past_secondary_id: z.number().int().positive().optional(),
-  student_id: z.string().uuid(),
+  student_id: z.string(),
   file_paths: z.string().min(1, "At least one file path is required"),
   created_at: z.date().default(() => new Date())
 });
+
 
 export type Transcript = z.infer<typeof TranscriptSchema>;
 export type PastSecondarySchool = z.infer<typeof PastSecondarySchoolSchema>;

@@ -81,24 +81,36 @@ export function StudentForm() {
       lastName: '',
       gender: 'MALE',
     }));
-     
-     const res =  await fetch('http://192.168.1.11:3000/api/tempStudents',{
-        method: 'POST',
 
-        body: JSON.stringify(formData),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-     }) 
-     if(res){
+      const res = await fetch(`${process.env.BASE_URL}/tempStudents`, {
+      method: 'POST',
+      body: JSON.stringify(validatedData), // Send validated data
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!res.ok) {
+      throw new Error('Failed to post data');
+    }
+
+    // Refetch the full list of students from DB
+    const updatedRes = await fetch(`${process.env.BASE_URL}/tempStudents`);
+    if (!updatedRes.ok) {
+      throw new Error('Failed to fetch updated students list');
+    }
+
+        const updatedStudents = await updatedRes.json();
+         setStudents(updatedStudents); // Update state with latest data
+
         const selectedDepartment = DepartmentList.find(
        dept => dept.value === validatedData.department
     );
       setInputValue(selectedDepartment?.label || '');
+      
       setErrors({});
-         
-     }
-  
+     
+
     } catch (error) {
       if (error instanceof z.ZodError) {
         const newErrors: Record<string, string> = {};
