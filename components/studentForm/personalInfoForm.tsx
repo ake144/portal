@@ -48,6 +48,11 @@ export default function PersonalInfoForm({ nextStep }: { nextStep: () => void })
       const mockData: Partial<StudentFullInfo> = {
         student_id: `STD-${Math.floor(1000 + Math.random() * 9000)}`,
         department_id: 'animal_health',
+        firstName: 'John',
+        fatherName: 'Doe',
+        program_id: 'Animal Health',
+        grandFather_Name: 'Smith',
+        admission_type_id: 'Regular',
         registration_date: new Date().toISOString().split('T')[0],
       };
       setPersonalInfo({ ...initialPersonalInfo, ...mockData });
@@ -136,21 +141,20 @@ export default function PersonalInfoForm({ nextStep }: { nextStep: () => void })
                   id="firstName"
                   name="firstName"
                   value={getValue('firstName')}
-                  onChange={handleChange}
-                  className={getInputClassName('firstName', !!errors.firstName)}
-                  placeholder="Enter first name"
+                   className='bg-gray-50'
+                  readOnly
                 />
                 {errors.firstName && <p className="text-red-500 text-sm mt-1">{errors.firstName}</p>}
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="fatherName">Father's Name</Label>
+                <Label htmlFor="fatherName">Father's Name  <span className="text-red-500">*</span></Label>
                 <Input
                   id="fatherName"
                   name="fatherName"
                   value={getValue('fatherName')}
-                  onChange={handleChange}
-                  placeholder="Enter father's name"
+                  className='bg-gray-50'
+                  readOnly
                 />
               </div>
 
@@ -162,9 +166,8 @@ export default function PersonalInfoForm({ nextStep }: { nextStep: () => void })
                   id="grandFather_Name"
                   name="grandFather_Name"
                   value={getValue('grandFather_Name')}
-                  onChange={handleChange}
-                  className={getInputClassName('grandFather_Name', !!errors.grandFather_Name)}
-                  placeholder="Enter grandfather's name"
+                  className='bg-gray-50'
+                  readOnly
                 />
                 {errors.grandFather_Name && (
                   <p className="text-red-500 text-sm mt-1">{errors.grandFather_Name}</p>
@@ -367,7 +370,15 @@ export default function PersonalInfoForm({ nextStep }: { nextStep: () => void })
                 <Label htmlFor="department_id">
                   Department <span className="text-red-500">*</span>
                 </Label>
-                <select
+                  <Input
+                  id="department_id"
+                  name="department_id"
+                  value={getValue('department_id')}
+                  readOnly
+                  className='bg-gray-50'
+                  />
+
+                {  /* <select
                   id="department_id"
                   name="department_id"
                   value={getValue('department_id')}
@@ -381,10 +392,10 @@ export default function PersonalInfoForm({ nextStep }: { nextStep: () => void })
                   <option value="cooperative_accounting">Cooperative Accounting</option>
                   <option value="crop_protection">Crop Protection</option>
                   <option value="natural_resources">Natural Resources Conservation</option>
-                </select>
+                </select> */}
                 {errors.department_id && <p className="text-red-500 text-sm mt-1">{errors.department_id}</p>}
               </div>
-              <div className="space-y-2">
+              {/* <div className="space-y-2">
                 <Label htmlFor="program_id">
                   Program ID <span className="text-red-500">*</span>
                 </Label>
@@ -397,7 +408,7 @@ export default function PersonalInfoForm({ nextStep }: { nextStep: () => void })
                   placeholder="Enter program ID"
                 />
                 {errors.program_id && <p className="text-red-500 text-sm mt-1">{errors.program_id}</p>}
-              </div>
+              </div> */}
               <div className="space-y-2">
                 <Label htmlFor="admission_type_id">
                   Admission Type <span className="text-red-500">*</span>
@@ -406,9 +417,11 @@ export default function PersonalInfoForm({ nextStep }: { nextStep: () => void })
                   id="admission_type_id"
                   name="admission_type_id"
                   value={getValue('admission_type_id')}
-                  onChange={handleChange}
-                  className={getInputClassName('admission_type_id', !!errors.admission_type_id)}
-                  placeholder="Enter admission type"
+                  readOnly
+                  className='bg-gray-50'
+                  // onChange={handleChange}
+                  // className={getInputClassName('admission_type_id', !!errors.admission_type_id)}
+                  // placeholder="Enter admission type"
                 />
                 {errors.admission_type_id && <p className="text-red-500 text-sm mt-1">{errors.admission_type_id}</p>}
               </div>

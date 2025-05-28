@@ -59,7 +59,7 @@ export const parentInfo = z.object({
     address_woreda: z.string().optional(),
     address_zone: z.string().optional(),
     address_region: z.string().optional(),
-    phone: z.string().optional(),
+    phone: z.string().min(1, "Phone number is required"),
     po_box: z.string().optional(),
 })
 
@@ -97,7 +97,6 @@ export type EmergencyContactType = z.infer<typeof emergencyContact>;
 
 export const TranscriptSchema = z.object({
   transcript_id: z.number().int().positive().optional(),
-  student_id: z.string(),
   grade_9_file_path: z.string().min(1, "Grade 9 file path is required"),
   grade_10_file_path: z.string().min(1, "Grade 10 file path is required"),
   grade_11_file_path: z.string().min(1, "Grade 11 file path is required"),
@@ -105,14 +104,12 @@ export const TranscriptSchema = z.object({
   exam_file_path: z.string().min(1, "Exam file path is required"),
   english_grade: z.number().int().min(0).max(100),
   maths_grade: z.number().int().min(0).max(100),
-  created_at: z.date().default(() => new Date())
+ 
 });
 
 export const PastSecondarySchoolSchema = z.object({
   past_secondary_id: z.number().int().positive().optional(),
-  student_id: z.string(),
-  file_paths: z.string().min(1, "At least one file path is required"),
-  created_at: z.date().default(() => new Date())
+  file_paths: z.string().optional(),
 });
 
 

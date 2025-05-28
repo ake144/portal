@@ -9,31 +9,62 @@ import ContactInfoForm from './contactInfoForm';
 import AcademicBackgroundForm from './academicBackground';
 import EmploymentHistoryForm from './employmentHistory';
 
+
 const steps = [
   { id: 1, label: 'Personal info', description: 'Basic information' },
   { id: 2, label: 'Contact info', description: 'Contact details' },
   { id: 3, label: 'Academic info', description: 'Education background' },
   { id: 4, label: 'Family info', description: 'Family details' },
-  { id: 5, label: 'Employment history', description: 'Work experience' },
+  { id: 5, label: 'Employment history', description: 'Work experience',  },
 ];
 
 export default function MultiStepForm() {
   const [step, setStep] = useState(1);
   const { personalInfo, contactInfo, academicInfo, familyInfo, employmentHistory } = useStudentFormStore();
-    
+  
+
+
   const nextStep = () => setStep(prev => Math.min(prev + 1, 5));
   const prevStep = () => setStep(prev => Math.max(prev - 1, 1));
 
   const handleSubmit = async () => {
-    // Implement your submission logic here
-    console.log('Final form data:', {
+
+    try{
+      
+  const formData = {
       personal: personalInfo,
       contact: contactInfo,
       academic: academicInfo,
       family: familyInfo,
       employment: employmentHistory
+    };
+    console.log('Submitting form data:', formData);
+
+    const response = await fetch('/submitForm', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(formData),
     });
-  };
+
+    if (!response.ok) {
+      console.error('Failed to submit form:', response.statusText);
+      return;
+    }
+
+    console.log('Form submitted successfully');
+    setStep(1);
+ 
+
+  } catch (error) {
+    console.error('Error submitting form:', error);
+  }
+
+
+    };
+  
+
 
   const getStepStatus = (stepId: number) => {
     if (stepId < step) return 'completed';
@@ -158,7 +189,7 @@ export default function MultiStepForm() {
         
         {step === 5 && (
           <EmploymentHistoryForm 
-            nextStep={nextStep}
+            nextStep={handleSubmit}
             prevStep={prevStep}
           />
         )}

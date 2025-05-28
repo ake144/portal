@@ -1,13 +1,13 @@
-// EmploymentHistoryForm.tsx
 'use client';
 import { useStudentFormStore } from '@/store/studentFormStore';
-import { EmploymentHistory, EmploymentHistoryType } from '@/utils/typeSchema';
+import { EmploymentHistory } from '@/utils/typeSchema';
 import { useState } from 'react';
 import { z } from 'zod';
 
-export default function EmploymentHistoryForm({ nextStep, prevStep }: { 
+export default function EmploymentHistoryForm({ nextStep, prevStep, isLastStep = false }: { 
   nextStep: () => void; 
-  prevStep: () => void 
+  prevStep: () => void;
+  isLastStep?: boolean;
 }) {
   const { employmentHistory, setEmploymentHistory } = useStudentFormStore();
   const [errors, setErrors] = useState<Record<number, Record<string, string>>>({});
@@ -16,7 +16,7 @@ export default function EmploymentHistoryForm({ nextStep, prevStep }: {
     setEmploymentHistory([
       ...employmentHistory,
       {
-        student_id: '2', // Set this to the actual student ID if available
+        student_id: '2', // Replace with dynamic ID if available
         created_at: new Date(),
         is_current: 'No',
         type_of_job: '',
@@ -39,12 +39,11 @@ export default function EmploymentHistoryForm({ nextStep, prevStep }: {
     });
   };
 
-  const handleChange = (index: number, field: string, value: string | number | boolean) => {
+  const handleChange = (index: number, field: string, value: string | number | boolean | undefined) => {
     const updated = [...employmentHistory];
     updated[index] = { ...updated[index], [field]: value };
     setEmploymentHistory(updated);
     
-    // Clear errors for this field
     if (errors[index]?.[field]) {
       setErrors(prev => ({
         ...prev,
@@ -55,13 +54,20 @@ export default function EmploymentHistoryForm({ nextStep, prevStep }: {
 
   const validateAndProceed = async () => {
     try {
-      const validatedData = await Promise.all(
-        employmentHistory.map((entry, index) => 
-          EmploymentHistory.parseAsync(entry)
-        )
-      );
-      setEmploymentHistory(validatedData);
-      nextStep();
+      // Validate all entries if any exist
+      if (employmentHistory.length > 0) {
+        const validatedData = await Promise.all(
+          employmentHistory.map(entry => EmploymentHistory.parseAsync(entry))
+        );
+        setEmploymentHistory(validatedData);
+      }
+
+      // Proceed to next step
+      if (isLastStep) {
+        await nextStep(); // If nextStep is async
+      } else {
+        nextStep();
+      }
     } catch (error) {
       if (error instanceof z.ZodError) {
         const newErrors: Record<number, Record<string, string>> = {};
@@ -130,7 +136,11 @@ export default function EmploymentHistoryForm({ nextStep, prevStep }: {
                   min="1900"
                   max={currentYear}
                   value={entry.service_years_from || ''}
-                  onChange={(e) => handleChange(index, 'service_years_from', parseInt(e.target.value))}
+                  onChange={(e) => handleChange(
+                    index,
+                    'service_years_from',
+                    e.target.value ? parseInt(e.target.value) : undefined
+                  )}
                   className="w-full p-2.5 border rounded-md"
                   placeholder="YYYY"
                 />
@@ -145,7 +155,11 @@ export default function EmploymentHistoryForm({ nextStep, prevStep }: {
                   min="1900"
                   max={currentYear + 5}
                   value={entry.service_years_to || ''}
-                  onChange={(e) => handleChange(index, 'service_years_to', parseInt(e.target.value))}
+                  onChange={(e) => handleChange(
+                    index,
+                    'service_years_to',
+                    e.target.value ? parseInt(e.target.value) : undefined
+                  )}
                   className="w-full p-2.5 border rounded-md"
                   placeholder="YYYY"
                   disabled={entry.is_current === 'Yes'}
@@ -223,7 +237,7 @@ export default function EmploymentHistoryForm({ nextStep, prevStep }: {
           onClick={validateAndProceed}
           className="px-6 py-2.5 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
         >
-          Complete Registration →
+          {isLastStep ? 'Complete Registration →' : 'Next →'}
         </button>
       </div>
     </div>
