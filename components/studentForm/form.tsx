@@ -170,7 +170,9 @@ export function StudentForm() {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-1 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">First Name</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">First Name 
+                   <span className="text-red-500">*</span>
+              </label>
               <input
                 name="firstName"
                 value={formData.firstName}
@@ -182,7 +184,7 @@ export function StudentForm() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Middle Name</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Middle Name  <span className="text-red-500">*</span> </label>
               <input
                 name="middleName"
 
@@ -190,10 +192,11 @@ export function StudentForm() {
                 onChange={handleChange}
                 className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
+              {errors.middleName && <p className="text-red-500 text-xs mt-1">{errors.middleName}</p>}
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Last Name  <span className="text-red-500">*</span> </label>
               <input
                 name="lastName"
                 required
@@ -205,7 +208,7 @@ export function StudentForm() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Gender</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Gender  <span className="text-red-500">*</span> </label>
               <div className="flex gap-4">
                 <label className="flex items-center space-x-2">
                   <input
@@ -235,7 +238,7 @@ export function StudentForm() {
             </div>
 
             <div className="relative" ref={dropdownRef}>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Department</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Department  <span className="text-red-500">*</span> </label>
             <div className="relative">
               <input
                 type="text"
