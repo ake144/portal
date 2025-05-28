@@ -4,14 +4,13 @@ import {z} from 'zod';
 import { de, fa, pl } from 'zod/v4/locales';
 
 export const StudentSchema = z.object({
-  id: z.string().min(1, "ID is required"),
-  firstName: z.string().min(1, "First name is required"),
-  middleName: z.string().min(1, "Middle name is required"),
-  lastName: z.string().min(1, "Last name is required"),
-  gender: z.enum(['MALE', 'FEMALE'], { 
-    required_error: "Gender is required" 
-  }),
-  department: z.string().min(1, "Department is required"),
+    id: z.string(),
+    firstName: z.string(),
+    middleName: z.string(),
+    lastName: z.string(),
+    departmentId: z.number(),
+
+
 });
 
 
