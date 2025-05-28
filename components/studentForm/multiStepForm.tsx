@@ -30,7 +30,7 @@ export default function MultiStepForm() {
   const handleSubmit = async () => {
 
     try{
-      
+
   const formData = {
       personal: personalInfo,
       contact: contactInfo,
@@ -84,7 +84,7 @@ export default function MultiStepForm() {
         </p>
         
         {/* Progress Indicator */}
-        <div className="flex items-center justify-between max-w-4xl mx-auto">
+        <div className="md:flex items-center justify-between grid grid-cols-3 max-w-4xl mx-auto">
           {steps.map((currentStep, index) => {
             const status = getStepStatus(currentStep.id);
             const isLast = index === steps.length - 1;

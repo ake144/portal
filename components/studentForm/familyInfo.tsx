@@ -204,7 +204,8 @@ export default function FamilyInfoForm({ nextStep, prevStep }: FamilyInfoFormPro
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pl-6">
               <div className="space-y-2">
-                <Label>Phone Number</Label>
+                <Label>Phone Number <span className="text-red-500">*</span>
+                   </Label>
                 <Input
                   type="tel"
                   value={parent.phone}

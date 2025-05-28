@@ -82,9 +82,9 @@ export function StudentForm() {
       gender: 'MALE',
     }));
 
-      const res = await fetch(`${process.env.BASE_URL}/tempStudents`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/tempStudents`, {
       method: 'POST',
-      body: JSON.stringify(validatedData), // Send validated data
+      body: JSON.stringify(validatedData), 
       headers: {
         'Content-Type': 'application/json',
       },
@@ -95,7 +95,7 @@ export function StudentForm() {
     }
 
     // Refetch the full list of students from DB
-    const updatedRes = await fetch(`${process.env.BASE_URL}/tempStudents`);
+    const updatedRes = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/tempStudents`);
     if (!updatedRes.ok) {
       throw new Error('Failed to fetch updated students list');
     }
