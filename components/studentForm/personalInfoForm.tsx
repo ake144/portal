@@ -61,6 +61,10 @@ export default function PersonalInfoForm({ nextStep }: { nextStep: () => void })
         admission_type_id: 'Regular',
         registration_date: new Date().toISOString().split('T')[0],
       };
+    
+      // Simulate fetching data from an API
+  
+
       setPersonalInfo({ ...initialPersonalInfo, ...mockData });
     }
     fetchStudentData();
