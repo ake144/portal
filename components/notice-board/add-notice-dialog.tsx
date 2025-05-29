@@ -14,16 +14,27 @@ interface College {
   id: number;
   name: string;
 }
+interface Department {
+  id: number;
+  name: string;
+  college_id: number;
+}
+
+
 
 interface AddNoticeCardProps {
   colleges: College[];
+  departments: Department[];
   onNoticeAdded: () => void;
   onCancel: () => void;
 }
 
-export function AddNoticeCard({ colleges, onNoticeAdded, onCancel }: AddNoticeCardProps) {
+
+
+export function AddNoticeCard({ colleges, departments, onNoticeAdded, onCancel }: AddNoticeCardProps) {
   const [formData, setFormData] = useState({
     college_id: "",
+    department_id: "",
     message: "",
     deadline: "",
     is_active: true,
@@ -54,6 +65,7 @@ export function AddNoticeCard({ colleges, onNoticeAdded, onCancel }: AddNoticeCa
           college_id: "",
           message: "",
           deadline: "",
+          department_id: "",
           is_active: true,
         });
         onNoticeAdded();
@@ -83,7 +95,7 @@ export function AddNoticeCard({ colleges, onNoticeAdded, onCancel }: AddNoticeCa
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="space-y-3">
-          <Label htmlFor="college">College *</Label>
+          <Label htmlFor="college">College <span className="text-red-500">*</span></Label>
           <Select
             value={formData.college_id}
             onValueChange={(value) => setFormData((prev) => ({ ...prev, college_id: value }))}
@@ -101,9 +113,28 @@ export function AddNoticeCard({ colleges, onNoticeAdded, onCancel }: AddNoticeCa
             </SelectContent>
           </Select>
         </div>
+        <div className="space-y-3">
+          <Label htmlFor="department">Department <span className="text-red-500">*</span></Label>
+          <Select
+            value={formData.college_id}
+            onValueChange={(value) => setFormData((prev) => ({ ...prev, college_id: value }))}
+            required
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Select a department" />
+            </SelectTrigger>
+            <SelectContent>
+              {colleges.map((college) => (
+                <SelectItem key={college.id} value={college.id.toString()}>
+                  {college.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
 
         <div className="space-y-3">
-          <Label htmlFor="message">Notice Message *</Label>
+          <Label htmlFor="message">Notice Message <span className="text-red-500">*</span></Label>
           <Textarea
             id="message"
             placeholder="Enter the notice content..."
@@ -117,7 +148,7 @@ export function AddNoticeCard({ colleges, onNoticeAdded, onCancel }: AddNoticeCa
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-3">
-            <Label htmlFor="deadline">Deadline *</Label>
+            <Label htmlFor="deadline">Deadline <span className="text-red-500">*</span></Label>
             <Input
               id="deadline"
               type="date"
