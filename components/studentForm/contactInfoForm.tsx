@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useStudentFormStore } from "@/store/studentFormStore";
+import { useStudentFormStore } from "@/lib/store/studentFormStore";
 import { z } from 'zod';
 import { useState } from 'react';
 import { emergencyContact } from '@/utils/typeSchema';

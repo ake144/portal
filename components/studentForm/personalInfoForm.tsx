@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useStudentFormStore } from '@/store/studentFormStore';
+import { useStudentFormStore } from '@/lib/store/studentFormStore';
 import { StudentFullInfo } from '@/utils/typeSchema';
 import { useEffect, useState } from 'react';
 import { z } from 'zod';

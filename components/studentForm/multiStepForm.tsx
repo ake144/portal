@@ -2,7 +2,7 @@
 'use client';
 import { useState } from 'react';
 import { Check } from 'lucide-react';
-import { useStudentFormStore } from '@/store/studentFormStore';
+import { useStudentFormStore } from '@/lib/store/studentFormStore';
 import PersonalInfoForm from './personalInfoForm';
 import FamilyInfoForm from './familyInfo';
 import ContactInfoForm from './contactInfoForm';

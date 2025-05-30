@@ -1,6 +1,6 @@
 'use client';
 
-import { useStudentFormStore } from '@/store/studentFormStore';
+import { useStudentFormStore } from '@/lib/store/studentFormStore';
 import { ParentInfoType } from '@/utils/typeSchema';
 import { useState, useEffect } from 'react';
 import { z } from 'zod';
