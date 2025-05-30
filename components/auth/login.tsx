@@ -74,7 +74,7 @@ const Login = () => {
         description: "Welcome back to the Student Portal!",
       });
 
-      router.push('/');
+      router.push('/registration');
     } catch (error) {
       toast("Login Failed", {
         description: "Invalid mainId or password. Please try again.",
